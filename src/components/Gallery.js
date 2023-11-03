@@ -2,23 +2,45 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import ImageItem from './ImageItem';
+import { FaCheckSquare } from 'react-icons/fa';
 
 const GalleryContainer = styled.div`
   max-width: 800px;
   margin: 20px auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 `;
 
 const ControlContainer = styled.div`
   max-width: 800px;
-  margin: 20px auto;
+  margin: 1rem auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-`;
 
+  input[type="file"] {
+    display: none;
+  }
+
+  label {
+    padding: 0.5rem 1rem;
+    background-color: #eee;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+
+  .selected-info {
+    display: flex;
+    align-items: center;
+
+    span {
+      margin-right: 1rem;
+    }
+  }
+`;
 function Gallery({ initialImages }) {
   const [images, setImages] = useState(initialImages);
   const [selectedImages, setSelectedImages] = useState([]);
@@ -90,11 +112,14 @@ function Gallery({ initialImages }) {
   return (
     <div>
       <ControlContainer>
-        <input type="file" multiple onChange={addImages} />
         <div>
-          <span>{selectedImages.length} images selected</span>
-          <button onClick={deleteSelected}>Delete Selected</button>
+          <span> <FaCheckSquare color="blue" /> {selectedImages.length} images selected</span>
+          <button className='delete-selected-button' onClick={deleteSelected}>Delete Selected</button>
         </div>
+        <label>
+          Add Images
+          <input type="file" multiple onChange={addImages} />
+        </label>
       </ControlContainer>
 
       <GalleryContainer>
