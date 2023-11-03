@@ -4,9 +4,19 @@ import styled from 'styled-components';
 import ImageItem from './ImageItem';
 
 const GalleryContainer = styled.div`
+  max-width: 800px;
+  margin: 20px auto;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 1rem;
+`;
+
+const ControlContainer = styled.div`
+  max-width: 800px;
+  margin: 20px auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 function Gallery({ initialImages }) {
@@ -22,6 +32,36 @@ function Gallery({ initialImages }) {
       }
     });
   };
+
+  const onDragStart = (e, id) => {
+    e.dataTransfer.setData('text/plain', id);
+  };
+
+  const onDragOver = (e) => {
+    e.preventDefault();
+    e.currentTarget.classList.add('image-can-drop');
+  };
+
+  const onDrop = (e, dropId) => {
+    e.currentTarget.classList.remove('image-can-drop');
+
+    const dragId = e.dataTransfer.getData('text');
+
+    // Find the dragged image and the drop target
+    const dragIndex = images.findIndex(img => img.id === parseFloat(dragId));
+    const dropIndex = images.findIndex(img => img.id === dropId);
+
+    if (dragIndex !== dropIndex) {
+      const newImages = [...images];
+
+      // Swap the images
+      [newImages[dragIndex], newImages[dropIndex]] = [newImages[dropIndex], newImages[dragIndex]];
+
+      setImages(newImages);
+    }
+  };
+
+
 
   const handleDelete = id => {
     setImages(images.filter(image => image.id !== id));
@@ -49,14 +89,13 @@ function Gallery({ initialImages }) {
 
   return (
     <div>
-      {/* Input for adding more images */}
-      <input type="file" multiple onChange={addImages} />
-
-      {/* Display the count of selected images */}
-      <div>{selectedImages.length} images selected</div>
-
-      {/* Add the "Delete Selected" button */}
-      <button onClick={deleteSelected}>Delete Selected</button>
+      <ControlContainer>
+        <input type="file" multiple onChange={addImages} />
+        <div>
+          <span>{selectedImages.length} images selected</span>
+          <button onClick={deleteSelected}>Delete Selected</button>
+        </div>
+      </ControlContainer>
 
       <GalleryContainer>
         {images.map(image => (
@@ -66,6 +105,9 @@ function Gallery({ initialImages }) {
             isSelected={selectedImages.includes(image.id)}
             onSelect={handleSelect}
             onDelete={handleDelete}
+            onDragStart={onDragStart}
+            onDragOver={onDragOver}
+            onDrop={onDrop}
           />
         ))}
       </GalleryContainer>

@@ -6,11 +6,9 @@ const ImageContainer = styled.div`
   position: relative;
   width: 100px;
   height: 100px;
-
+  border: 2px solid transparent;
   &:hover {
-    transform: scale(1.05);
-    transition: transform 0.3s ease-in-out;
-    outline: 1px solid #ccc; // This was the existing hover effect to show an outline.
+    border: 2px solid #ccc;
   }
 `;
 
@@ -26,7 +24,8 @@ const Image = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border: ${props => props.isSelected ? '2px solid blue' : '1px solid transparent'};
+  transition: border 0.3s;
+  border: ${props => props.isSelected ? '2px solid blue' : '2px solid transparent'};
 `;
 
 const SelectIcon = styled.div`
@@ -34,6 +33,13 @@ const SelectIcon = styled.div`
   top: 10px;
   right: 10px;
   cursor: pointer;
+  background-color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const DeleteIcon = styled.div`
@@ -41,11 +47,18 @@ const DeleteIcon = styled.div`
   top: 10px;
   left: 10px;
   cursor: pointer;
+  background-color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
-function ImageItem({ image, isSelected, onSelect, onDelete }) {
+function ImageItem({ image, isSelected, onSelect, onDelete, onDragStart, onDragOver, onDrop }) {
   return (
-    <ImageContainer>
+    <ImageContainer draggable onDragStart={e => onDragStart(e, image.id)} onDragOver={onDragOver} onDrop={e => onDrop(e, image.id)}>
       <Image src={image.url} alt="Gallery Item" style={getImageStyle(isSelected)} onClick={() => onSelect(image.id)} />
       {isSelected && <SelectIcon>X</SelectIcon>}
       <DeleteIcon onClick={() => onDelete(image.id)}>D</DeleteIcon>
