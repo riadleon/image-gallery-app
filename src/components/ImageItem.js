@@ -6,15 +6,20 @@ const ImageContainer = styled.div`
   position: relative;
   width: 100px;
   height: 100px;
+
   &:hover {
-    outline: 1px solid #ccc;
+    transform: scale(1.05);
+    transition: transform 0.3s ease-in-out;
+    outline: 1px solid #ccc; // This was the existing hover effect to show an outline.
   }
 `;
 
+
 const getImageStyle = (isSelected) => {
-    return {
-        border: isSelected ? '2px solid blue' : '1px solid transparent'
-    };
+  return {
+    border: isSelected ? '2px solid blue' : '1px solid transparent',
+    opacity: isSelected ? 1 : 0.5
+  };
 }
 
 const Image = styled.img`
@@ -39,13 +44,13 @@ const DeleteIcon = styled.div`
 `;
 
 function ImageItem({ image, isSelected, onSelect, onDelete }) {
-    return (
-        <ImageContainer>
-            <Image src={image.url} alt="Gallery Item" style={getImageStyle(isSelected)} onClick={() => onSelect(image.id)} />
-            {isSelected && <SelectIcon>X</SelectIcon>}
-            <DeleteIcon onClick={() => onDelete(image.id)}>D</DeleteIcon>
-        </ImageContainer>
-    );
+  return (
+    <ImageContainer>
+      <Image src={image.url} alt="Gallery Item" style={getImageStyle(isSelected)} onClick={() => onSelect(image.id)} />
+      {isSelected && <SelectIcon>X</SelectIcon>}
+      <DeleteIcon onClick={() => onDelete(image.id)}>D</DeleteIcon>
+    </ImageContainer>
+  );
 }
 
 export default ImageItem;

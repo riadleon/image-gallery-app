@@ -28,18 +28,48 @@ function Gallery({ initialImages }) {
     setSelectedImages(selectedImages.filter(selectedId => selectedId !== id));
   };
 
+  const deleteSelected = () => {
+    setImages(images.filter(image => !selectedImages.includes(image.id)));
+    setSelectedImages([]); // Clear the selected images
+  };
+
+  const addImages = (event) => {
+    const files = event.target.files;
+    let newImages = [...images];
+    for (let file of files) {
+      newImages.push({
+        id: new Date().getTime() + Math.random(),
+        url: URL.createObjectURL(file)
+      });
+    }
+    setImages(newImages);
+  };
+
+
+
   return (
-    <GalleryContainer>
-      {images.map(image => (
-        <ImageItem 
-          key={image.id}
-          image={image}
-          isSelected={selectedImages.includes(image.id)}
-          onSelect={handleSelect}
-          onDelete={handleDelete}
-        />
-      ))}
-    </GalleryContainer>
+    <div>
+      {/* Input for adding more images */}
+      <input type="file" multiple onChange={addImages} />
+
+      {/* Display the count of selected images */}
+      <div>{selectedImages.length} images selected</div>
+
+      {/* Add the "Delete Selected" button */}
+      <button onClick={deleteSelected}>Delete Selected</button>
+
+      <GalleryContainer>
+        {images.map(image => (
+          <ImageItem
+            key={image.id}
+            image={image}
+            isSelected={selectedImages.includes(image.id)}
+            onSelect={handleSelect}
+            onDelete={handleDelete}
+          />
+        ))}
+      </GalleryContainer>
+    </div>
   );
 }
 

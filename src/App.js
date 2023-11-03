@@ -1,6 +1,8 @@
 // src/App.js
 import React from 'react';
 import './App.css';
+import './styles.css';
+
 import Gallery from './components/Gallery';
 
 const initialImages = [
