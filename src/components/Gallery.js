@@ -1,8 +1,10 @@
-// src/components/Gallery.js
+
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import ImageItem from './ImageItem';
 import { FaCheckSquare } from 'react-icons/fa';
+import { FaPlus } from 'react-icons/fa';
+
 
 const GalleryContainer = styled.div`
   max-width: 800px;
@@ -11,6 +13,22 @@ const GalleryContainer = styled.div`
   flex-wrap: wrap;
   justify-content: center;
 `;
+const BigImageContainer = styled.div`
+  width: 240px;
+  height: 240px;
+  margin: 10px;
+  display: flex;              // Added flex display
+  justify-content: center;    // Center content horizontally
+  align-items: center;        // Center content vertically
+
+  img {
+    max-width: 100%;          // Maximum width is 100% of the container
+    max-height: 100%;         // Maximum height is 100% of the container
+    width: auto;              // Default width is auto (scale to height)
+    height: auto;             // Default height is auto (scale to width)
+  }
+`;
+
 
 const ControlContainer = styled.div`
   max-width: 800px;
@@ -41,6 +59,32 @@ const ControlContainer = styled.div`
     }
   }
 `;
+
+const AddImageBoxContainer = styled.div`
+  width: 124px;  // Adjust the width to match the other image items
+  height: 124px; // Adjust the height to match the other image items
+  margin: 10px;  // Same margin as other items for consistent spacing
+  border: 2px dashed #ccc;
+  background-color: #f8f8f8;
+  color: #bbb;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    border-color: #aaa;
+    color: #888;
+  }
+`;
+const TopBar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%; /* Ensure the container spans the full width */
+`;
+
+
 function Gallery({ initialImages }) {
   const [images, setImages] = useState(initialImages);
   const [selectedImages, setSelectedImages] = useState([]);
@@ -83,6 +127,31 @@ function Gallery({ initialImages }) {
     }
   };
 
+  const unselectAll = () => {
+    setSelectedImages([]);
+  };
+
+
+  const AddImageBox = ({ onFileChange }) => {
+    const fileInputRef = React.useRef();
+
+    const handleClick = () => {
+      fileInputRef.current.click();
+    };
+
+    return (
+      <AddImageBoxContainer onClick={handleClick}>
+        <FaPlus size={32} />
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          onChange={onFileChange}
+          style={{ display: 'none' }}
+        />
+      </AddImageBoxContainer>
+    );
+  };
 
 
   const handleDelete = id => {
@@ -106,35 +175,67 @@ function Gallery({ initialImages }) {
     }
     setImages(newImages);
   };
+  const renderImageItems = () => {
+    let galleryItems = images.map((image, index) => {
+      // Making the first image bigger
+      if (index === 0) {
+        return (
+          <BigImageContainer key={image.id}>
+            <ImageItem
+              image={image}
+              isSelected={selectedImages.includes(image.id)}
+              onSelect={handleSelect}
+              onDelete={handleDelete}
+              onDragStart={onDragStart}
+              onDragOver={onDragOver}
+              onDrop={onDrop}
+              isBig={true}
+            />
+          </BigImageContainer>
+        );
+      }
+      // Render the rest of the images
+      return (
+        <ImageItem
+          key={image.id}
+          image={image}
+          isSelected={selectedImages.includes(image.id)}
+          onSelect={handleSelect}
+          onDelete={handleDelete}
+          onDragStart={onDragStart}
+          onDragOver={onDragOver}
+          onDrop={onDrop}
+          isBig={false}
+        />
+      );
+    });
 
+    
+    galleryItems.push(
+      <AddImageBox key="add-image" onFileChange={addImages} />
+    );
+
+    return galleryItems;
+  };
 
 
   return (
     <div>
       <ControlContainer>
-        <div>
-          <span> <FaCheckSquare color="blue" /> {selectedImages.length} images selected</span>
+        <TopBar>
+          {/* Make the entire span clickable to unselect all */}
+          <button
+            onClick={unselectAll}
+            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+          >
+            <FaCheckSquare color="blue" /> {selectedImages.length} images selected
+          </button>
           <button className='delete-selected-button' onClick={deleteSelected}>Delete Selected</button>
-        </div>
-        <label>
-          Add Images
-          <input type="file" multiple onChange={addImages} />
-        </label>
+        </TopBar>
       </ControlContainer>
 
       <GalleryContainer>
-        {images.map(image => (
-          <ImageItem
-            key={image.id}
-            image={image}
-            isSelected={selectedImages.includes(image.id)}
-            onSelect={handleSelect}
-            onDelete={handleDelete}
-            onDragStart={onDragStart}
-            onDragOver={onDragOver}
-            onDrop={onDrop}
-          />
-        ))}
+        {renderImageItems()}
       </GalleryContainer>
     </div>
   );

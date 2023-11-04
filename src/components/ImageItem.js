@@ -1,7 +1,7 @@
-// src/components/ImageItem.js
+
 import React from 'react';
 import styled from 'styled-components';
-import {  FaCheckSquare } from 'react-icons/fa';
+import { FaCheckSquare } from 'react-icons/fa';
 
 
 const DeleteIcon = styled.div`
@@ -12,24 +12,25 @@ const DeleteIcon = styled.div`
   background-color: white;
   width: 20px;
   height: 20px;
-  border-radius: 50%;
-  display: none;  // hide it by default
+  display: ${props => props.isSelected ? 'block' : 'none'};
   align-items: center;
   justify-content: center;
   color: red;
   font-weight: bold;
 `;
 
-
-const ImageContainer = styled.div`
+const DynamicImageContainer = styled.div`
   position: relative;
-  width: 120px; 
-  height: 120px; 
+  width: ${props => props.isBig ? '240px' : '120px'}; 
+  height: ${props => props.isBig ? '240px' : '120px'}; 
   border: 2px solid transparent;
   background: #fff;
   border-radius: 4px;
   margin: 10px;
   transition: all 0.3s;
+  display: flex;              
+  justify-content: center;    
+  align-items: center;        
 
   &:hover {
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
@@ -55,7 +56,16 @@ const Image = styled.img`
   border-radius: 2px;
   transition: all 0.3s;
   transform: ${props => props.isSelected ? 'scale(0.95)' : 'scale(1)'};
+
+  // Apply different styles when the image is supposed to be big
+  ${props => props.isBig && `
+    width: auto; // Adjust as necessary for your layout
+    height: auto; // Adjust as necessary for your layout
+    max-width: 100%; // Prevents the image from overflowing its container
+    max-height: 100%; // Prevents the image from overflowing its container
+  `}
 `;
+
 
 const SelectIcon = styled.div`
   position: absolute;
@@ -70,13 +80,25 @@ const SelectIcon = styled.div`
 
 
 
-function ImageItem({ image, isSelected, onSelect, onDelete, onDragStart, onDragOver, onDrop }) {
+function ImageItem({ image, isSelected, onSelect, onDelete, onDragStart, onDragOver, onDrop, isBig }) {
   return (
-    <ImageContainer draggable onDragStart={e => onDragStart(e, image.id)} onDragOver={onDragOver} onDrop={e => onDrop(e, image.id)}>
-      <Image src={image.url} alt="Gallery Item" style={getImageStyle(isSelected)} onClick={() => onSelect(image.id)} />
+    <DynamicImageContainer
+      draggable
+      onDragStart={e => onDragStart(e, image.id)}
+      onDragOver={onDragOver}
+      onDrop={e => onDrop(e, image.id)}
+      isBig={isBig}
+    >
+      <Image
+        src={image.url}
+        alt="Gallery Item"
+        style={getImageStyle(isSelected)}
+        onClick={() => onSelect(image.id)}
+        isBig={isBig}
+      />
       {isSelected && <SelectIcon><FaCheckSquare color="blue" /></SelectIcon>}
-      {/* <DeleteIcon onClick={() => onDelete(image.id)}>D</DeleteIcon> */}
-    </ImageContainer>
+      
+    </DynamicImageContainer>
   );
 }
 
